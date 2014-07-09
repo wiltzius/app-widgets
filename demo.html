@@ -47,7 +47,7 @@ license that can be found in the LICENSE file.
         background-color: white;
       }
       .conversation {
-        height: 80px;   /* Make sure this value lines up with app-list.height */
+        height: 80px;   /* Make sure this value lines up with app-list[height] */
         display: flex;
         border-bottom: 1px solid lightgray;
       }
@@ -123,7 +123,8 @@ license that can be found in the LICENSE file.
             </paper-menu-button>
           </core-toolbar>
           <app-column>
-            <app-list id="messages">
+            <!-- Ensure app-list height lines up with the app-dismissable-item height -->
+            <app-list id="messages" height="80">
               <app-dismissable-list class="padding-wrapper" on-dismiss-items="{{ dismissItem }}">
                 <template repeat>
                   <app-dismissable-item class="item conversation" id="{{ id }}">
