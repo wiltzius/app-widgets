@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<link rel="import" href="bower_components/polymer/polymer.html">
+<script src="scrolling.js"></script>
+<!--
+  API contract:
+    Set "height" to height of row elements
+    Set "count" to the number of row elements to retain padding space for in the runway
+    Set "data provider" to the number of
+    Populate the light DOM of an infinite list with a repeated template that displays data provider items, give it the attribute "list" 
+    The physical elements will be managed by the scrolling engine
+-->
+<polymer-element name="infinite-list" attributes="height count dataProvider">
+  <template>
+    <style>
+      :host {
+        display: block;
+        overflow-y: scroll;
+      }
+    </style>
+      <div id="runway">
+        <content id="listContent"></content>
+      </div>
+  </template>
+  <script>
+    Polymer('infinite-list', {
+      height: 70,
+      count: 500,
+      domReady: function() {
+        this.$.runway.style.height = this.height * this.count + 'px';
+        this.dataProvider = new FakeDataProvider(this.count);
+      },
+      dataProviderChanged: function() {
+        this.engine = new ScrollingEngine({
+          height: this.height,
+          container: this,
+          template: this.querySelector('infinite-list::shadow #listContent::content template[infiniterepeat]'),
+          dataProvider: this.dataProvider,
+        });
+      }
+    });
+  </script>
+</polymer-element>

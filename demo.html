@@ -130,7 +130,7 @@ license that can be found in the LICENSE file.
             <!-- Ensure app-list height lines up with the app-dismissable-item height -->
             <app-list id="messages" height="80">
               <app-dismissable-list class="padding-wrapper" on-dismiss-items="{{ dismissItem }}">
-                <template repeat>
+                <template repeat infiniterepeat>
                   <app-dismissable-item class="item conversation" id="{{ id }}">
                     <div class="avatar" style="background-color: {{ avatarColor }}">{{ avatarLetter }}</div>
                     <div class="summary">

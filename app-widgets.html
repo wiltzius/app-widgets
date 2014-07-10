@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="infinite-list.html">
 <script src="dynamics.js"></script>
 <script src="scrolling.js"></script>
 <style>
@@ -367,6 +368,7 @@ body {
     });
   </script>
 </polymer-element>
+<!--
 <polymer-element name="app-list" attributes="height count">
   <template>
     <style>
@@ -381,7 +383,7 @@ body {
   </template>
   <script>
     Polymer('app-list', {
-      height: 70, 
+      height: 70,
       count: 500,
       attached: function() {
         this.$.runway.style.height = this.height * this.count + 'px';
@@ -394,6 +396,27 @@ body {
         });
       },
     });
+  </script>
+</polymer-element>
+-->
+<polymer-element name="app-list" attributes="height count">
+  <template>
+    <style>
+      :host {
+        display: flex;
+        flex: 1;
+      }
+    </style>
+    <infinite-list id="listInstance" height="{{height}}" count="{{count}}">
+      <content></content>
+    </infinite-list>
+  </template>
+  <script>
+    Polymer('app-list', {
+      ready: function() {
+        //this.$.listInstance.dataProvider = new FakeDataProvider(this.count);
+        }
+      });
   </script>
 </polymer-element>
 <polymer-element name="app-expand-menu">
