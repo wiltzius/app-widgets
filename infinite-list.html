@@ -25,9 +25,9 @@
     Polymer('infinite-list', {
       height: 70,
       count: 500,
+      dataProvider: null,
       domReady: function() {
         this.$.runway.style.height = this.height * this.count + 'px';
-        this.dataProvider = new FakeDataProvider(this.count);
       },
       dataProviderChanged: function() {
         this.engine = new ScrollingEngine({

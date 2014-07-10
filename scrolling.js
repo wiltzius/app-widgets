@@ -24,7 +24,8 @@ function ScrollingEngine(options) {
 
   this.template_.model = this.physicalData_;
 
-  Platform.endOfMicrotask(function() {
+  // Wait until the template binding and any element upgrades have taken effect
+  Polymer.whenPolymerReady(function() {
     this.physicalItems_ = new Array(this.physicalCount_);
     for (var i = 0, item = this.template_.nextElementSibling;
          item && i < this.physicalCount_;
