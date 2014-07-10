@@ -92,7 +92,7 @@ body {
       toggle: function() {
         this.controller.toggle();
       },
-      enteredView: function() {
+      attached: function() {
         var content = this.$.content;
         var mask = this.$.mask;
         this.controller = new DrawerController({
@@ -291,7 +291,7 @@ body {
   <script>
     Polymer('app-dismissable-item', {
       animateHeight: false,
-      enteredView: function() {
+      attached: function() {
         this.animateHeight = window.location.search.indexOf('animateHeightOnDismiss') != -1;
         this.style.WebkitTransform = 'translate3d(0,0,0)';
         this.controller = new DismissController({
@@ -347,7 +347,7 @@ body {
     Polymer('app-scrollarea-toolbar', {
       for: null,
       location: 'top',
-      enteredView: function() {
+      attached: function() {
         if (this.location == 'top')
           this.style.top = 0;
         else
@@ -383,7 +383,7 @@ body {
     Polymer('app-list', {
       height: 70, 
       count: 500,
-      enteredView: function() {
+      attached: function() {
         this.$.runway.style.height = this.height * this.count + 'px';
         this.data = new FakeDataProvider(this.count);
         this.engine = new ScrollingEngine({
