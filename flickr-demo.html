@@ -5,6 +5,7 @@
     <script src="bower_components/platform/platform.js"></script>
     <meta name="viewport" content="width=device-width, user-scalable=yes, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0">
     <link rel="import" href="x-paper-flickr-streamer.html">
     <style>
       body {
@@ -12,19 +13,14 @@
         font-family: "RobotoDraft",Helvetica,Arial,sans-serif;
         font-weight: 300;
         line-height: 24px;
-        width: 100%;
-        height: 100%;
-        padding: 0;
-        margin: 0;
       }
       div.container {
-        width: 100%;
-        height: 500px;
-        background-color: PapayaWhip;
+        background-color: #eceff1;
+        height: 400px;
       }
     </style>
   </head>
-  <body class="polymer-ui-body-text" unresolved>
+  <body class="polymer-ui-body-text" unresolved fullbleed layout horizontal>
      <core-scaffold>
       <core-header-panel navigation flex mode="seamed">
         <core-toolbar>Application</core-toolbar>
@@ -37,7 +33,7 @@
       <div>
         <div class="container">
           <x-flickrstreamer>
-          </x-flickrstreamer>
+          </x-flickrstreamer> 
         </div>
       </div>
     </core-scaffold> 
