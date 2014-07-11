@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>flickr-widget</title>
+    <script src="bower_components/platform/platform.js"></script>
+    <meta name="viewport" content="width=device-width, user-scalable=yes, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="import" href="x-paper-flickr-streamer.html">
+    <style>
+      body {
+        -webkit-user-select: none;
+        font-family: "RobotoDraft",Helvetica,Arial,sans-serif;
+        font-weight: 300;
+        line-height: 24px;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      div.container {
+        width: 100%;
+        height: 500px;
+        background-color: PapayaWhip;
+      }
+    </style>
+  </head>
+  <body class="polymer-ui-body-text" unresolved>
+     <core-scaffold>
+      <core-header-panel navigation flex mode="seamed">
+        <core-toolbar>Application</core-toolbar>
+        <core-menu theme="core-light-theme">
+          <core-item icon="settings" label="item1"></core-item>
+          <core-item icon="settings" label="item2"></core-item>
+        </core-menu>
+      </core-header-panel>
+      <div tool>Title</div>
+      <div>
+        <div class="container">
+          <x-flickrstreamer>
+          </x-flickrstreamer>
+        </div>
+      </div>
+    </core-scaffold> 
+  </body>
+</html>

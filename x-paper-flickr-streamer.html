@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/core-elements/core-elements.html">
+<polymer-element name="x-flickrstreamer" attributes="height count">
+  <template>
+    <style>
+      core-list {
+        height: 100%;
+      }
+      .item {
+        height: 80px;
+        overflow: hidden;
+      }
+    </style>
+    <core-ajax auto handleAs="json" id="flickrPipe"></x-flickrdata>
+    <core-list id="listInstance" height=80 data="{{items}}">
+      <template>
+        <!-- the top-level container of the template block must be the same height as
+              the app-list's specified height!  -->
+        <!-- the data that's referenced here is what must
+              be provided by the app-list's dataProvider -->
+        <div class="item">
+          <a href="{{ url_z }}"><img src="{{ url_z }}"/></a>
+        </div>
+      </template>
+    <app-list>
+  </template>
+  <script>
+    Polymer('x-flickrstreamer', {
+      items: null,
+      ready: function() {
+        this.$.flickrPipe.url = 'https://api.flickr.com/services/rest/';
+        this.$.flickrPipe.params = {
+          'method': 'flickr.interestingness.getList',
+          'extras': ['description','license','date_upload',' date_taken','owner_name','icon_server','original_format','last_update','geo','tags','machine_tags','o_dims','views','media',' path_alias','url_sq','url_t','url_s','url_q','url_m','url_n','url_z','url_c','url_l','url_o]',],
+          'format': 'json',
+          'per_page': '500',
+          'nojsoncallback': 1,
+          'api_key': 'bb962ee3ecbe7d27e28fa116a641c245'
+          };
+        this.$.flickrPipe.addEventListener('core-response', function(e) {
+          console.log(e.detail.response.photos.photo);
+          this.items = e.detail.response.photos.photo;
+        }.bind(this));
+      },
+    });
+  </script>
+</polymer-element>
