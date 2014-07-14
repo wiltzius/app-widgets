@@ -1,0 +1,29 @@
+{
+  "name": "TemplateBinding",
+  "homepage": "https://github.com/Polymer/TemplateBinding",
+  "authors": [
+    "The Polymer Authors"
+  ],
+  "dependencies": {
+    "NodeBind": "Polymer/NodeBind#master",
+    "observe-js": "Polymer/observe-js#master"
+  },
+  "license": "BSD",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "2a006d1635",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "2a006d1635241b6a0b8ba11a8250ec1d8dacad7a"
+  },
+  "_source": "git://github.com/Polymer/TemplateBinding.git",
+  "_target": "master",
+  "_originalSource": "Polymer/TemplateBinding"
+}

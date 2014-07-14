@@ -1,0 +1,35 @@
+{
+  "name": "ShadowDOM",
+  "main": "shadowdom.js",
+  "homepage": "https://github.com/Polymer/ShadowDOM",
+  "authors": [
+    "The Polymer Authors"
+  ],
+  "description": "ShadowDOM Polyfill",
+  "keywords": [
+    "shadowdom"
+  ],
+  "dependencies": {
+    "WeakMap": "Polymer/WeakMap#master",
+    "observe-js": "Polymer/observe-js#master"
+  },
+  "license": "BSD",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "../",
+    "test",
+    "tests"
+  ],
+  "_release": "db04e2193a",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "db04e2193a076120294dbcdc86da6c3680e92828"
+  },
+  "_source": "git://github.com/Polymer/ShadowDOM.git",
+  "_target": "master",
+  "_originalSource": "Polymer/ShadowDOM"
+}

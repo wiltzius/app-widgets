@@ -2,6 +2,7 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/core-elements/core-elements.html">
 <link rel="import" href="bower_components/paper-elements/paper-elements.html">
+<link rel="import" href="x-flickr-shadowbox.html">
 <polymer-element name="x-flickrstreamer" attributes="height count">
   <template>
     <style>
@@ -15,44 +16,6 @@
         overflow: hidden;
         perspective: 1200px;
       }
-      .shadowbox {
-        box-sizing: border-box;
-        height: {{itemHeight-16}}px;
-        margin-left: 16px;
-        margin-top: 8px;
-        margin-right: 16px;
-        position: relative;
-        -webkit-transform-style: preserve-3d;
-      }
-      .shadowbox .front {
-        backface-visibility: hidden;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        overflow: hidden;
-      }
-      .shadowbox .back {
-        position: absolute;
-        top: 0;
-        left: 0;
-        background-color: teal;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        backface-visibility: hidden;
-        transform: rotateY(180deg);
-      }
-      .header-img {
-        height: 220px;
-        overflow: hidden;
-      }
-      .header-img .img {
-        width: 100%;
-      }
-      .header-img .description {
-        overflow: none;
-      }
     </style>
     <core-ajax auto handleAs="json" id="flickrPipe"></core-ajax>
     <core-list id="listInstance" height="{{itemHeight}}" data="{{items}}" on-scroll="{{listScrolling}}">
@@ -62,56 +25,35 @@
         <!-- the data that's referenced here is what must
               be provided by the app-list's dataProvider -->
         <div class="item">
-          <div class="shadowbox" on-tap="{{shadowTap}}" on-down="{{shadowGestureDown}}" touch-action="pan-y" on-trackstart="{{shadowGestureStart}}" on-trackend="{{shadowGestureEnd}}" on-track="{{shadowGestureTrack}}">
-            <paper-shadow z="1"></paper-shadow>
-            <div class="back">
-              this is the back
-            </div>
-            <div class="front">
-              <div class="header-img">
-                <img src="{{ url_m }}" />
-              </div>
-              <h3>{{title}}</h3>
-              <div class="description">
-                {{ description._content }}
-              </div>
-            </div>
-          </div>
-
+          <x-flickr-shadowbox photoModel="{{photo}}"></x-flickr-shadowbox>
         </div>
       </template>
-    <app-list>
+    </core-list>
   </template>
   <script>
     Polymer('x-flickrstreamer', {
       itemHeight: 360,
-      rotation: 0,
       maxPage: 0,
       ready: function() {
-        this.$.flickrPipe.addEventListener('core-response', function(e) {
-          console.log(e.detail.response.photos.photo);
-          if(!this.items) {
-            this.items = new Array();
-          }
-          this.items = this.items.concat(e.detail.response.photos.photo);
-          console.log(this.items);
-        }.bind(this));
-        this.fetchMorePhotos(1);
+        this.$.flickrPipe.addEventListener('core-response',
+            this.processMorePhotos.bind(this));
+        this.fetchMorePhotos();
       },
       listScrolling: function(e) {
         //todo only check this occasionally rather than every frame, its wasteful
         //todo don't re-query the scroll height every frame
         var l = this.$.listInstance;
-        if((l.scrollHeight - l.scrollTop) < (l.extraItems * l.height)) {
-          console.log('going back for more');
-          this.fetchMorePhotos();
+        if((l.scrollHeight - l.scrollTop) < (l.extraItems * l.height)
+            && !this.pendingPhotos) {
+          console.log('would go back for more');
+          //this.fetchMorePhotos();
         }
       },
       fetchMorePhotos: function() {
         this.$.flickrPipe.url = 'https://api.flickr.com/services/rest/';
         this.$.flickrPipe.params = {
           'method': 'flickr.interestingness.getList',
-          'extras': ['description','license','date_upload',' date_taken','owner_name','icon_server','original_format','last_update','geo','tags','machine_tags','o_dims','views','media',' path_alias','url_sq','url_t','url_s','url_q','url_m','url_n','url_z','url_c','url_l','url_o]',],
+          'extras': ['description','license','date_upload',' date_taken','owner_name','icon_server','original_format','last_update','geo','tags','machine_tags','o_dims','views','media',' path_alias','url_sq','url_t','url_s','url_q','url_m','url_n','url_z','url_c','url_l','url_o]'],
           'format': 'json',
           'per_page': '50',
           'page': this.maxPage,
@@ -119,33 +61,21 @@
           'api_key': 'bb962ee3ecbe7d27e28fa116a641c245'
           };
         this.maxPage++;
+        this.pendingPhotos = true;
       },
-      shadowTap: function(e) {
+      processMorePhotos: function(e) {
+        // wrap each result object to make it easier to access in the template
+        var newPhotos = new Array(e.detail.response.photos.photo.length);
+        for(p in e.detail.response.photos.photo) {
+          newPhotos[p] = { 'photo': e.detail.response.photos.photo[p] }
+        };
+        if(!this.items) {
+          this.items = new Array();
+        }
+        this.items = this.items.concat(newPhotos);
+        this.pendingPhotos = false;
+        console.log('Got more photos:');
       },
-      shadowGestureDown: function(e, detail, sender) {
-      },
-      shadowGestureTrack: function(e) {
-        this.rotation = e.clientX;
-        this.animationPlayer.currentTime = (this.rotation / 360) * 2000;
-      },
-      shadowGestureStart: function(e, detail, sender) {
-        console.log('beginning animation on ', sender);
-        var keyframes = [
-          { transform: 'translateX(0)' },
-          { transform: 'translateX(25%)' }
-          ];
-        this.animation = new Animation(sender,
-                                       keyframes,
-                                       { duration: 2000,
-                                         fill: "both",
-                                       });
-        this.animationPlayer = document.timeline.play(this.animation);
-        this.animationPlayer.pause();
-      },
-      shadowGestureEnd: function(e) {
-        console.log('ended on ' + e.target);
-        this.animationPlayer.play();
-      }
     });
   </script>
 </polymer-element>
