@@ -21,13 +21,15 @@
         position: relative;
       }
       #shadowbox .front {
-        backface-visibility: hidden;
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         overflow: hidden;
+      }
+      #shadowbox.interaction .front {
+        backface-visibility: hidden;
       }
       #shadowbox .back {
         position: absolute;
@@ -39,6 +41,10 @@
         overflow: hidden;
         backface-visibility: hidden;
         transform: rotateY(180deg);
+        display: none;
+      }
+      #shadowbox.interaction div.back {
+        display: block;
       }
       .header-img {
         height: 220px;
@@ -75,13 +81,14 @@
   </template>
   <script>
     Polymer('x-flickr-shadowbox', {
-      dragDuration_: 2000,
+      dragDuration_: 750,
       photoModelChanged: function(oldVal, newVal) {
         this.$.description.innerHTML = newVal.description._content;
       },
       ready: function() {
       },
       shadowTap: function(e, detail, sender) {
+        this.$.shadowbox.classList.add('interaction');
         //FIXME lame timer-based approach to not tapping if you were just dragging
         if(Date.now() - this.lastDrag < 100
             || this.dragPlayer && this.dragPlayer.currentTime > 0) {
@@ -107,33 +114,39 @@
           );
       },
       shadowGestureTrack: function(e) {
-        var dragOffset = e.clientX;
-        this.dragPlayer.currentTime = (dragOffset / 360) * 2000;
+        var dragOffset = e.pageX- this.dragBeginLocation;
+        var timelineOffset =
+          (dragOffset / window.screen.width) * this.dragDuration_;
+        this.dragPlayer.currentTime = this.timelineBegin + timelineOffset;
         // clamp the values of currentTime to the valid animation range
         if(this.dragPlayer.currentTime < 0) {
           this.dragPlayer.currentTime = 0;
           }
         if(this.dragPlayer.currentTime > this.dragDuration_) {
-          this.dragPlayer.currentTime = 0;
+          this.dragPlayer.currentTime = 2000;
           }
-        else {
-          
-          this.dragPlayer.currentTime = (dragOffset / 360) * this.dragDuration_;
-        }
-        // if hit the end of the animation, do thing
+        console.log('tracking to', this.dragPlayer.currentTime);
+        //TODO if hit the end of the animation, do thing
       },
       shadowGestureStart: function(e, detail, sender) {
+        this.$.shadowbox.classList.add('interaction');
         console.log('beginning gesture on ', sender);
-        this.dragging = true;
-        var keyframes = [
-          { transform: 'translateX(0)' },
-          { transform: 'translateX(25%)' }
-          ];
-        this.dragPlayer = this.$.shadowbox.animate(keyframes,
-                                                   { duration: this.dragDuration_,
-                                                     fill: 'both',
-                                                     easing: 'ease-out'
-                                                   });
+        // If there isn't a drag in progress, start a new animation
+        if(!this.dragPlayer) {
+          var keyframes = [
+            { transform: 'translateX(0)' },
+            { transform: 'translateX(25%)' }
+            ];
+          this.dragPlayer = this.$.shadowbox.animate(keyframes,
+                                                     { duration: this.dragDuration_,
+                                                       fill: 'both',
+                                                       easing: 'ease-out'
+                                                     });
+        }
+        // Using either the new animation or the existing one, reset
+        // where this drag has begun from.
+        this.dragBeginLocation = e.pageX;
+        this.timelineBegin = this.dragPlayer.currentTime;
         this.dragPlayer.pause();
       },
       shadowGestureEnd: function(e, detail, sender) {
