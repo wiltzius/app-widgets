@@ -75,25 +75,28 @@
   </template>
   <script>
     Polymer('x-flickr-shadowbox', {
-      rotation: 0,
+      dragDuration_: 2000,
       photoModelChanged: function(oldVal, newVal) {
         this.$.description.innerHTML = newVal.description._content;
       },
       ready: function() {
       },
-      shadowTap: function(e) {
-        console.log('tapped', this);
-        if(this.dragging) {
+      shadowTap: function(e, detail, sender) {
+        //FIXME lame timer-based approach to not tapping if you were just dragging
+        if(Date.now() - this.lastDrag < 100
+            || this.dragPlayer && this.dragPlayer.currentTime > 0) {
+          console.log('early out from tap');
           return;
         }
         if(this.rotationPlayer) {
-          console.log('reversing');
+          console.log('rotating');
           this.rotationPlayer.reverse();
           if(this.rotationPlayer.finished) {
             this.rotationPlayer.play();
             }
           return;
         }
+        console.log('starting rotation animation');
         this.rotationPlayer = this.$.touchContainer.animate(
           [{ transform: 'rotateY(0deg);' },
            { transform: 'rotateY(180deg);' }],
@@ -103,12 +106,21 @@
           }
           );
       },
-      shadowGestureDown: function(e, detail, sender) {
-        
-      },
       shadowGestureTrack: function(e) {
         var dragOffset = e.clientX;
         this.dragPlayer.currentTime = (dragOffset / 360) * 2000;
+        // clamp the values of currentTime to the valid animation range
+        if(this.dragPlayer.currentTime < 0) {
+          this.dragPlayer.currentTime = 0;
+          }
+        if(this.dragPlayer.currentTime > this.dragDuration_) {
+          this.dragPlayer.currentTime = 0;
+          }
+        else {
+          
+          this.dragPlayer.currentTime = (dragOffset / 360) * this.dragDuration_;
+        }
+        // if hit the end of the animation, do thing
       },
       shadowGestureStart: function(e, detail, sender) {
         console.log('beginning gesture on ', sender);
@@ -118,14 +130,23 @@
           { transform: 'translateX(25%)' }
           ];
         this.dragPlayer = this.$.shadowbox.animate(keyframes,
-                                                   { duration: 2000,
+                                                   { duration: this.dragDuration_,
                                                      fill: 'both',
                                                      easing: 'ease-out'
                                                    });
         this.dragPlayer.pause();
       },
-      shadowGestureEnd: function(e) {
-        this.dragging = false;
+      shadowGestureEnd: function(e, detail, sender) {
+        this.lastDrag = e.timeStamp;
+        console.log('ending gesture');
+        if(this.dragPlayer.currentTime == 0) {
+          return;
+        }
+        if(this.dragPlayer.playbackRate > 0) {
+          this.dragPlayer.reverse();
+          console.log('reversing');
+        }
+        this.dragPlayer.play();
       }
     });
   </script>
