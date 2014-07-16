@@ -1,29 +1,18 @@
 {
-  "name": "polymer-dev",
-  "description": "Polymer is a new type of library for the web, built on top of Web Components, and designed to leverage the evolving web platform on modern browsers.",
-  "homepage": "http://www.polymer-project.org/",
-  "keywords": [
-    "util",
-    "client",
-    "browser",
-    "web components",
-    "web-components"
-  ],
-  "author": "Polymer Authors <polymer-dev@googlegroups.com>",
+  "name": "polymer",
   "private": true,
   "dependencies": {
-    "core-component-page": "Polymer/core-component-page#master",
-    "platform-dev": "Polymer/platform-dev#master",
-    "polymer-expressions": "Polymer/polymer-expressions#master",
-    "polymer-gestures": "Polymer/polymer-gestures#master"
+    "platform": "Polymer/platform#master",
+    "core-component-page": "Polymer/core-component-page#master"
   },
-  "_release": "6ad2d61028",
+  "homepage": "https://github.com/Polymer/polymer",
+  "_release": "5199f21c33",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "6ad2d610287352433baa407b04cc174631ccb5b5"
+    "commit": "5199f21c336701491b5cd752b6da1b009ad4caf7"
   },
-  "_source": "git://github.com/Polymer/polymer-dev.git",
+  "_source": "git://github.com/Polymer/polymer.git",
   "_target": "master",
-  "_originalSource": "Polymer/polymer-dev"
+  "_originalSource": "Polymer/polymer"
 }

@@ -9,11 +9,11 @@
     "core-toolbar": "Polymer/core-toolbar#master"
   },
   "homepage": "https://github.com/Polymer/core-menu-button",
-  "_release": "101838ded5",
+  "_release": "984a913f89",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "101838ded57dd60146704ba730de109783803e13"
+    "commit": "984a913f896a57307aa6420d7aba2e837e53f9d8"
   },
   "_source": "git://github.com/Polymer/core-menu-button.git",
   "_target": "master",

@@ -54,34 +54,31 @@
         width: 100%;
       }
       #description {
-        margin: 8px;
         text-overflow: ellipsis;
-        white-space: nowrap;
         overflow: hidden;
-        height: 100%;
       }
     </style>
 
     <div id="shadowbox" class="interaction">
       <div id="touchContainer">
         <paper-shadow z="1"></paper-shadow>
-        <div class="back">
-          this is the back
+        <div class="back" layout vertical>
+          <h3>{{photoModel.title}}</h3>
+          <p>{{photoModel.ownername}}</p>
+          <p id="description" class="description" flex>{{photoModel.description.content_}}</p>
         </div>
         <div class="front" layout vertical>
           <div class="header-img">
             <img src="{{ photoModel.url_m }}" />
           </div>
-          <h3>{{title}}</h3>
-          <div id="description" class="description" flex>
-          </div>
+          <h3>{{photoModel.title}}<h3>
         </div>
       </div>
     </div>
   </template>
   <script>
     Polymer('x-flickr-shadowbox', {
-      dragDuration_: 750,
+      dragDuration_: 500,
       photoModelChanged: function(oldVal, newVal) {
         this.$.description.innerHTML = newVal.description._content;
       },
@@ -105,8 +102,9 @@
         }
         console.log('starting rotation animation');
         this.rotationPlayer = this.$.touchContainer.animate(
-          [{ transform: 'rotateY(0deg);' },
-           { transform: 'rotateY(180deg);' }],
+          [{ transform: 'translateZ(0px) rotateY(0deg);' },
+           { transform: 'translateZ(-225px) rotateY(90deg);' },
+           { transform: 'translateZ(0px) rotateY(180deg);' }],
           {
             duration: 500,
             fill: "both"

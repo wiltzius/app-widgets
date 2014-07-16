@@ -10,11 +10,11 @@
     "paper-ripple": "Polymer/paper-ripple#master"
   },
   "homepage": "https://github.com/Polymer/paper-tabs",
-  "_release": "0f9a5fbf5c",
+  "_release": "e5f555747c",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "0f9a5fbf5ce5c5ba27881115f6e4d4f0ce0505d0"
+    "commit": "e5f555747cd0be8f90c06d429db80f81bb0a5073"
   },
   "_source": "git://github.com/Polymer/paper-tabs.git",
   "_target": "master",

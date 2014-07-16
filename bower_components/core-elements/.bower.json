@@ -44,11 +44,11 @@
     "sampler-scaffold": "Polymer/sampler-scaffold#master"
   },
   "homepage": "https://github.com/Polymer/core-elements",
-  "_release": "c7ab9afbe5",
+  "_release": "a1d61308ee",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "c7ab9afbe527fcc37371310144ca80f1d0f20e19"
+    "commit": "a1d61308ee6a4e8478e5fbf872d70c74e8375b33"
   },
   "_source": "git://github.com/Polymer/core-elements.git",
   "_target": "master",

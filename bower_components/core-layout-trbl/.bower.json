@@ -5,11 +5,11 @@
     "polymer": "Polymer/polymer#master"
   },
   "homepage": "https://github.com/Polymer/core-layout-trbl",
-  "_release": "486b0c6306",
+  "_release": "ce833998ee",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "486b0c6306bb81828b00a8d1773d0415e9b6e588"
+    "commit": "ce833998ee247f8497e8c77893581accff92fa20"
   },
   "_source": "git://github.com/Polymer/core-layout-trbl.git",
   "_target": "master",

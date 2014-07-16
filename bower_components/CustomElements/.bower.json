@@ -24,11 +24,11 @@
     "test",
     "tests"
   ],
-  "_release": "eef2f8f7d7",
+  "_release": "9a64e04015",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "eef2f8f7d71ba474d40d59c743db049dbf174c0f"
+    "commit": "9a64e0401552d35fdfb277893d68c412ad9d4a88"
   },
   "_source": "git://github.com/Polymer/CustomElements.git",
   "_target": "master",

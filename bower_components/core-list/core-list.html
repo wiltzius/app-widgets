@@ -165,12 +165,11 @@ For performance reasons, not every item in the list is rendered at once.
 
     // TODO(sorvell): need to handle resizing
     initializeViewport: function() {
-      //this.$.viewport.style.height = this.height * this.data.length + 'px';
+      this.$.viewport.style.height = this.height * this.data.length + 'px';
       this._visibleCount = Math.ceil(this._target.offsetHeight / this.height);
       this._physicalCount = Math.min(this._visibleCount + this.extraItems,
           this.data.length);
       this._physicalHeight = this.height * this._physicalCount;
-      this.$.viewport.style.height = this._physicalHeight + 'px';
     },
 
     // TODO(sorvell): selection currently cannot be maintained when

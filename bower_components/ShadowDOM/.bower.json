@@ -23,11 +23,11 @@
     "test",
     "tests"
   ],
-  "_release": "db04e2193a",
+  "_release": "67607e7862",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "db04e2193a076120294dbcdc86da6c3680e92828"
+    "commit": "67607e78629f1f64a855520e0f028463e263609f"
   },
   "_source": "git://github.com/Polymer/ShadowDOM.git",
   "_target": "master",
