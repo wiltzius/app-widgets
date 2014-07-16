@@ -66,6 +66,7 @@
         top: 0;
         right: 0;
         z-index: 2;
+        transform: translateX(100%);
       }
       #description {
         text-overflow: ellipsis;
@@ -84,7 +85,7 @@
         <div class="front" layout vertical>
           <div class="header-img">
             <img src="{{ photoModel.url_m }}" />
-            <div class="tags">
+            <div class="tags" id="tags">
               <template repeat="{{ tag in tags }}">
                 <x-flickr-taglabel>{{ tag }}</x-flickr-taglabel>
               </template>
@@ -126,6 +127,7 @@
           );
       },
       shadowGestureTrack: function(e) {
+        // track the touch drag along the box's predefined translate animation
         var dragOffset = e.pageX- this.dragBeginLocation;
         var timelineOffset =
           (dragOffset / window.screen.width) * this.dragDuration_;
@@ -135,13 +137,25 @@
           this.dragPlayer.currentTime = 0;
           }
         if(this.dragPlayer.currentTime > this.dragDuration_) {
-          this.dragPlayer.currentTime = 2000;
+          this.dragPlayer.currentTime = this.dragDuration_;
           }
+        // (just some logging)
         if(!this.lastTrack) this.lastTrack=0;
         console.log('tracking by',
             360*0.25*(timelineOffset - this.lastTrack)/this._dragDuration);
         this.lastTrack = timelineOffset;
-        //TODO if hit the end of the animation, do thing
+
+        // If we're nearing the end of the animation, peek in the photo tags
+        var _peekThreshold = 0.75;
+        if(this.dragPlayer.currentTime > this._dragDuration * _peekThreshold) {
+          this.tagPlayer = this.$.tags.animate([
+            { transform: 'translateX(100%)' },
+            { transform: 'translateX(0%)' }
+            ],
+            { duration: 500 });
+          this.tagPlayer.play();
+          console.log('animating tags');
+        }
       },
       shadowGestureStart: function(e, detail, sender) {
         console.log('beginning gesture on ', sender);
