@@ -144,7 +144,6 @@
         this.dragPlayer.pause();
       },
       shadowGestureEnd: function(e, detail, sender) {
-        this.lastDrag = e.timeStamp;
         console.log('ending gesture');
         e.preventTap();
         if(this.dragPlayer.currentTime == 0) {
