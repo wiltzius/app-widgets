@@ -2,6 +2,7 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/core-elements/core-elements.html">
 <link rel="import" href="bower_components/paper-elements/paper-elements.html">
+<link rel="import" href="x-flickr-taglabel.html">
 <polymer-element name="x-flickr-shadowbox" on-down="{{shadowGestureDown}}" touch-action="pan-y" on-trackstart="{{shadowGestureStart}}" on-trackend="{{shadowGestureEnd}}" on-track="{{shadowGestureTrack}}" on-tap="{{shadowTap}}" attributes="photoModel">
   <template>
     <style>
@@ -14,11 +15,16 @@
         margin-left: 16px;
         margin-top: 8px;
         margin-right: 16px;
+        -webkit-transform-style: preserve-3d;
       }
       #touchContainer {
         height: 100%;
-        -webkit-transform-style: preserve-3d;
         position: relative;
+      }
+      #shadowbox.interaction #touchContainer {
+        -webkit-transform-style: preserve-3d;
+        /* make sure layer creation is already present for interaction */
+        transform: translateZ(0) rotateY(0); 
       }
       #shadowbox .front {
         position: absolute;
@@ -49,9 +55,17 @@
       .header-img {
         height: 220px;
         overflow: hidden;
+        position: relative;
       }
       .header-img .img {
         width: 100%;
+        z-index: 1;
+      }
+      .header-img .tags {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 2;
       }
       #description {
         text-overflow: ellipsis;
@@ -70,6 +84,11 @@
         <div class="front" layout vertical>
           <div class="header-img">
             <img src="{{ photoModel.url_m }}" />
+            <div class="tags">
+              <template repeat="{{ tag in tags }}">
+                <x-flickr-taglabel>{{ tag }}</x-flickr-taglabel>
+              </template>
+            </div>
           </div>
           <h3>{{photoModel.title}}<h3>
         </div>
@@ -81,6 +100,8 @@
       dragDuration_: 500,
       photoModelChanged: function(oldVal, newVal) {
         this.$.description.innerHTML = newVal.description._content;
+        // only take the first 6 (space-separated) tags
+        this.tags = newVal.tags.split(' ').splice(0,6);
       },
       ready: function() {
       },
@@ -123,7 +144,6 @@
         //TODO if hit the end of the animation, do thing
       },
       shadowGestureStart: function(e, detail, sender) {
-        //this.$.shadowbox.classList.add('interaction');
         console.log('beginning gesture on ', sender);
         // If there isn't a drag in progress, start a new animation
         if(!this.dragPlayer) {
