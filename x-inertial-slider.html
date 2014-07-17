@@ -15,7 +15,7 @@
     max: string value for translateX at end (default 100%)
     snapPoints: list of values to snap to. Default to none, but set to same
                 values as min/max to animate to them when released
-    skew: scale inputs by this value, slows everything down. Note if this is
+    resistance: scale inputs by this value, slows everything down. Note if this is
                 < 1 the user can't drag all the way to the max value (default
                 is 0.9)
  -->
@@ -45,12 +45,10 @@
   <script>
     Polymer('x-inertial-slider', {
       // controls resolution of the animation; set high to avoid rounding
-      skew: 0.9,
+      resistance: 0.9,
       //acceptableTimingSkew_: 20,   //TODO don't make this constant
       snappiness_: 20,
       dragDuration_: 5000,
-      dragBeginTimeline_: 0,
-      dragBeginCoordinate_: 0,
       min: '0%',
       max: '100%',
       logTag_: '\[inertial-slider\]',
@@ -63,11 +61,13 @@
           this.snapPoints = null;
         }
         // additional property initialization
-        this.easing_ = 'cubic-bezier(0.425, 0.965, 0.590, 1.015)';
-        this.dragPlayer_ = null;
+        this.easing = 'cubic-bezier(0.425, 0.965, 0.590, 1.015)';
+        this.initAnimationPlayer();   //TODO consider whether element.animate
+                                      // in a ready() function is harmful
+        this.dragBeginTimeline_ = null;
+        this.dragBeginCoordinate_ = null;
       },
-      gestureStart: function(e, detail, sender) {
-        this.log_('beginning slide gesture');
+      initAnimationPlayer: function() {
         // If there isn't a drag in progress, start a new animation
         if(!this.dragPlayer_) {
           var keyframes = [
@@ -77,18 +77,21 @@
           var animationTiming = {
             duration: this.dragDuration_,
             fill: 'both',
-            easing: this.easing_,
+            easing: this.easing,
           };
           this.dragPlayer_ = this.$.offsetContainer.animate(keyframes,
               animationTiming);
+          this.dragPlayer_.pause();
         }
-        // Using either the new animation or the existing one, reset
-        // where this drag has begun from. Use pageX to support events
-        // outside of the target
+      },
+      gestureStart: function(e, detail, sender) {
+        this.log_('beginning slide gesture');
+        // Reset where this drag has begun from. Use pageX as events may be
+        // outside of the target.
         this.dragBeginCoordinate_ = e.pageX;
         this.dragBeginTimeline_ = this.dragPlayer_.currentTime;
         this.dragPlayer_.playbackRate = 1;
-        this.dragPlayer_.play();
+        this.dragPlayer_.pause();
       },
       gestureEnd: function(e, detail, sender) {
         this.log_('ending gesture');
@@ -104,6 +107,13 @@
         }
       },
       gestureTrack: function(e, detail, sender) {
+        // If the element was programmatically added, we might have missed
+        // the gesture start event -- optionally call it.
+        if(this.dragBeginTimeline_ === null ||
+            this.dragBeginCoordinate_ === null) {
+          this.log_('got a track before gesture start');
+          this.gestureStart(e, detail, sender);
+        }
         // track the touch drag along the box's predefined translate animation
         var dragOffset = e.pageX - this.dragBeginCoordinate_;
         //TODO strictly speaking this should use page width not screen width
@@ -111,7 +121,7 @@
           (dragOffset / window.screen.width) *
           this.dragDuration_;
         var targetTime =
-            (this.dragBeginTimeline_ + timelineOffset) * this.skew
+            (this.dragBeginTimeline_ + timelineOffset) * this.resistance;
         // clamp the values of currentTime to the valid animation range
         if(targetTime < 0) {
           targetTime = 0;
