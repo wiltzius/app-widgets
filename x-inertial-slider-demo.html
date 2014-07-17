@@ -6,7 +6,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="import" href="x-inertial-slider.html">
     <style>
-      x-inertial-slider {
+      body {
+        overflow: hidden;
+      }
+      x-inertial-slider p {
         height: 100px;
         padding: 20px;
         margin: 10px;
@@ -20,8 +23,8 @@
     </style>
   </head>
   <body class="polymer-ui-body-text" unresolved fullbleed layout vertical>
-    <x-inertial-slider min="0" max="75%">
-      Slide me, I resist.
+    <x-inertial-slider min="0%" max="25%" >
+      <p>Slide me, I resist.</p>
     </x-inertial-slider>
   </body>
 </html>

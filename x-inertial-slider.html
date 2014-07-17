@@ -4,10 +4,12 @@
 <!--
 
   Attributes:
-    min: string value for translateX at beginning (default 0)
-    max: string value for translateX at end (required)
+    min: string value for translateX at beginning (default 0%)
+    max: string value for translateX at end (default 100%)
     snapPoints: list of values to snap to. Default to none, but set to same
                 values as min/max to animate to them when released
+    skew: scale inputs by this value, slows everything down. Note if this is < 1 the user can't drag all the way to the max value (default 0.9)
+    
  -->
 <polymer-element name="x-inertial-slider" touch-action="pan-y" on-trackstart="{{gestureStart}}" on-trackend="{{gestureEnd}}" on-track="{{gestureTrack}}" attributes="resistance touchElement useImplAnimation snapPoints snapAnimDuration min max">
   <template>
@@ -15,33 +17,45 @@
       :host {
         display: block;
       }
+      #log {
+        position: absolute;
+        z-index: 1000;
+        bottom: 10px;
+      }
     </style>
     <div id="slideContainer">
       <div id="offsetContainer">
         <content></content>
       </div>
     </div>
+    <div id="log"></div>
   </template>
   <script>
     Polymer('x-inertial-slider', {
-      dragDuration_: 5000,    // controls granularity of the animation
-      dragPlayer_: null,
+      // controls resolution of the animation; set high to avoid rounding
+      skew: 0.9,
+      dragDuration_: 5000,
       dragBeginTimeline_: 0,
       dragBeginCoordinate_: 0,
-      min: 0,
+      easing_: '',
+      min: '0%',
+      max: '100%',
       logTag_: '\[inertial-slider\]',
       log_: function(str) {
         console.log(this.logTag_, str);
+      this.$.log.innertHTML += str + '<br/>';
       },
       ready: function() {
         if(!this.snapPoints) {
           this.snapPoints = null;
         }
+        this.easing_ = 'cubic-bezier(0.425, 0.965, 0.590, 1.015)';
+        this.dragPlayer_ = null;
       },
       gestureStart: function(e, detail, sender) {
         this.log_('beginning slide gesture');
         // If there isn't a drag in progress, start a new animation
-        if(!this.dragPlayer) {
+        if(!this.dragPlayer_) {
           var keyframes = [
             { transform: 'translateX(' + this.min + ')' },
             { transform: 'translateX(' + this.max + ')' }
@@ -49,47 +63,53 @@
           var animationTiming = {
             duration: this.dragDuration_,
             fill: 'both',
-            easing: 'ease-out'
+            easing: this.easing_,
           };
-          this.dragPlayer = this.$.offsetContainer.animate(keyframes,
+          this.dragPlayer_ = this.$.offsetContainer.animate(keyframes,
               animationTiming);
         }
         // Using either the new animation or the existing one, reset
         // where this drag has begun from. Use pageX to support events
         // outside of the target
         this.dragBeginCoordinate_ = e.pageX;
-        this.dragBeginTimeline_ = this.dragPlayer.currentTime;
-        this.dragPlayer.pause();
+        this.dragBeginTimeline_ = this.dragPlayer_.currentTime;
+        this.dragPlayer_.pause();
+        this.dragPlayer_.playbackRate = 1;
       },
       gestureEnd: function(e, detail, sender) {
-        console.log('ending gesture');
+        this.log_('ending gesture');
         e.preventTap(); //TODO is this still needed?
-        if(this.dragPlayer.currentTime != 0) {
-          if(this.dragPlayer.playbackRate > 0) {
-            this.dragPlayer.reverse();
-            console.log('reversing');
+        if(this.dragPlayer_.currentTime != 0) {
+          if(this.dragPlayer_.playbackRate > 0) {
+            this.dragPlayer_.reverse();
+            this.log_('reversing');
           }
-          this.dragPlayer.play();
+          // set the playback rate such that
+          this.dragPlayer_.playbackRate = this.dragPlayer_.playbackRate*10;
+          this.dragPlayer_.play();
         }
       },
       gestureTrack: function(e, detail, sender) {
         // track the touch drag along the box's predefined translate animation
-        var dragOffset = e.pageX- this.dragBeginLocation;
+        var dragOffset = e.pageX - this.dragBeginCoordinate_;
+        //TODO this should probably be the touchable element's width not screen
         var timelineOffset =
-          (dragOffset / window.screen.width) * this.dragDuration_;
-        this.dragPlayer.currentTime = this.timelineBegin + timelineOffset;
+          (dragOffset / window.screen.width) *
+          this.dragDuration_;
+        this.dragPlayer_.currentTime = (this.dragBeginTimeline_ + timelineOffset) * this.skewFactor;
         // clamp the values of currentTime to the valid animation range
-        if(this.dragPlayer.currentTime < 0) {
-          this.dragPlayer.currentTime = 0;
+        if(this.dragPlayer_.currentTime < 0) {
+          this.dragPlayer_.currentTime = 0;
           }
-        if(this.dragPlayer.currentTime > this.dragDuration_) {
-          this.dragPlayer.currentTime = this.dragDuration_;
+        if(this.dragPlayer_.currentTime > this.dragDuration_) {
+          this.dragPlayer_.currentTime = this.dragDuration_;
           }
         // (just some logging)
-        if(!this.lastTrack) this.lastTrack=this.dragBeginLocation;
-        console.log('tracking by',
-            360*0.25*(timelineOffset - this.lastTrack)/this.dragDuration_);
-        this.lastTrack = timelineOffset;
+        if(!this.lastTrack_) this.lastTrack_ = this.dragBeginCoordinate_;
+        this.log_('tracking physically to ' + e.pageX + ' from ' + this.lastTrack_ +
+                  ' (diff ' + (e.pageX - this.lastTrack_) + ')');
+        this.log_('tracking animation to ' + this.dragPlayer_.currentTime);
+        this.lastTrack_ = e.pageX;
       },
     });
   </script>
