@@ -18,11 +18,11 @@
     "test",
     "tests"
   ],
-  "_release": "2a3ea6480d",
+  "_release": "1efb8a2ddb",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "2a3ea6480d053e660ff757adcffaa952812ce667"
+    "commit": "1efb8a2ddbdf8515a8a8ac59f747dd9b0e023a9a"
   },
   "_source": "git://github.com/Polymer/polymer-gestures.git",
   "_target": "master",

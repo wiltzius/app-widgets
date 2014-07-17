@@ -7,11 +7,11 @@
     "core-transition": "Polymer/core-transition#master"
   },
   "homepage": "https://github.com/Polymer/core-animated-pages",
-  "_release": "247e372019",
+  "_release": "d83b11b20b",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "247e37201922fafc9650cfe2fc9925e8fb2333b8"
+    "commit": "d83b11b20b261e6ebed439450462e365afac67e6"
   },
   "_source": "git://github.com/Polymer/core-animated-pages.git",
   "_target": "master",
