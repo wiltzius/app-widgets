@@ -66,6 +66,7 @@
         top: 0;
         right: 0;
         z-index: 2;
+        opacity: 0.8;
         transform: translateX(100%);
       }
       #description {
@@ -148,16 +149,41 @@
         // If we're nearing the end of the animation, peek in the photo tags
         var _peekThreshold = 0.55;
         if(this.dragPlayer.currentTime > this.dragDuration_ * _peekThreshold) {
-          console.log('hit tag peek threshold, beginning animation');
-          this.tagPlayer = this.$.tags.animate([
-            { transform: 'translateX(100%)' },
-            { transform: 'translateX(0%)' }
-            ],
-            { duration: 500,
-              fill: 'forwards'
-            });
-          this.tagPlayer.play();
-          console.log('animating tags');
+          // If we're crossing the threshold for the first time, animate
+          if(!this.tagPlayer) {
+            console.log('hit tag peek threshold, beginning animation');
+            this.tagPlayer = this.$.tags.animate([
+              { transform: 'translateX(100%)' },
+              { transform: 'translateX(0%)' }
+              ],
+              { duration: 400,
+                fill: 'forwards',
+                easing: 'ease-in-out'
+              });
+            this.tagPlayer.play();
+          }
+          // If this is a later time crossing the threshold
+          else {
+            // If the tags have already animated in, animate them back out
+            if(this.tagPeeked) {
+              //this.tagPlayer.playbackRate = -this.tagPlayer.playbackRate;
+              this.tagPlayer.reverse();
+              this.tagPeeked = false;
+            }
+            else {
+              console.log('overscrolling tags');
+            }
+          }
+        }
+        else {
+          if(this.tagPlayer) {
+            // we've crossed back before the peek threshold
+            this.tagPeeked = true;
+            
+          }
+          else {
+            // we've never crossed into the peek threshold; do nothing
+          }
         }
       },
       shadowGestureStart: function(e, detail, sender) {
