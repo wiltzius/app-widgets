@@ -9,8 +9,8 @@
       body {
         overflow: hidden;
       }
-      x-inertial-slider p {
-        height: 100px;
+      x-inertial-slider div {
+        will-change: transform; 
         padding: 20px;
         margin: 10px;
         box-sizing: border-box;
@@ -24,7 +24,24 @@
   </head>
   <body class="polymer-ui-body-text" unresolved fullbleed layout vertical>
     <x-inertial-slider min="0%" max="25%" >
-      <p>Slide me, I resist.</p>
+      <div>Slide me, I resist.</div>
+    </x-inertial-slider>
+    <x-inertial-slider min="0%" max="-25%" >
+      <div>Slide me, I resist in reverse.</div>
+    </x-inertial-slider>
+    <x-inertial-slider min="0%" max="25%"> 
+      <div style="background-color:teal;">
+        <x-inertial-slider min="0%" max="15%" >
+          <div>Paralaaaaxxxxxx</div>
+        </x-inertial-slider>
+      </div>
+    </x-inertial-slider>
+    <x-inertial-slider min="0%" max="25%"> 
+      <div style="background-color:teal;">
+        <x-inertial-slider min="0%" max="-15%" >
+          <div>Paralaaaaxxxxxx</div>
+        </x-inertial-slider>
+      </div>
     </x-inertial-slider>
   </body>
 </html>

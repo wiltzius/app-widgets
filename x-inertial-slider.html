@@ -3,13 +3,18 @@
 <link rel="import" href="bower_components/core-elements/core-elements.html">
 <!--
 
+  TODO:
+    - implement option to animate rather than skip pixels
+    - figure out initial jank
+
   Attributes:
     min: string value for translateX at beginning (default 0%)
     max: string value for translateX at end (default 100%)
     snapPoints: list of values to snap to. Default to none, but set to same
                 values as min/max to animate to them when released
-    skew: scale inputs by this value, slows everything down. Note if this is < 1 the user can't drag all the way to the max value (default 0.9)
-    
+    skew: scale inputs by this value, slows everything down. Note if this is
+                < 1 the user can't drag all the way to the max value (default
+                is 0.9)
  -->
 <polymer-element name="x-inertial-slider" touch-action="pan-y" on-trackstart="{{gestureStart}}" on-trackend="{{gestureEnd}}" on-track="{{gestureTrack}}" attributes="resistance touchElement useImplAnimation snapPoints snapAnimDuration min max">
   <template>
@@ -21,6 +26,9 @@
         position: absolute;
         z-index: 1000;
         bottom: 10px;
+      }
+      #offsetContainer {
+        will-change: transform;
       }
     </style>
     <div id="slideContainer">
@@ -37,7 +45,6 @@
       dragDuration_: 5000,
       dragBeginTimeline_: 0,
       dragBeginCoordinate_: 0,
-      easing_: '',
       min: '0%',
       max: '100%',
       logTag_: '\[inertial-slider\]',
@@ -49,6 +56,7 @@
         if(!this.snapPoints) {
           this.snapPoints = null;
         }
+        // additional property initialization
         this.easing_ = 'cubic-bezier(0.425, 0.965, 0.590, 1.015)';
         this.dragPlayer_ = null;
       },
@@ -96,7 +104,8 @@
         var timelineOffset =
           (dragOffset / window.screen.width) *
           this.dragDuration_;
-        this.dragPlayer_.currentTime = (this.dragBeginTimeline_ + timelineOffset) * this.skewFactor;
+        this.dragPlayer_.currentTime =
+            (this.dragBeginTimeline_ + timelineOffset) * this.skew;
         // clamp the values of currentTime to the valid animation range
         if(this.dragPlayer_.currentTime < 0) {
           this.dragPlayer_.currentTime = 0;
