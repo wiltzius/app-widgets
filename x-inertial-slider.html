@@ -3,6 +3,9 @@
 <link rel="import" href="bower_components/core-elements/core-elements.html">
 <!--
 
+  A non-visual slideable element whose motion has a bit of resistance to the
+  physical touch input shoving it around.
+
   TODO:
     - implement option to animate rather than skip pixels
     - figure out initial jank
@@ -29,6 +32,7 @@
       }
       #offsetContainer {
         will-change: transform;
+        transform: translateX({{min}});
       }
     </style>
     <div id="slideContainer">
@@ -42,6 +46,8 @@
     Polymer('x-inertial-slider', {
       // controls resolution of the animation; set high to avoid rounding
       skew: 0.9,
+      //acceptableTimingSkew_: 20,   //TODO don't make this constant
+      snappiness_: 20,
       dragDuration_: 5000,
       dragBeginTimeline_: 0,
       dragBeginCoordinate_: 0,
@@ -81,8 +87,8 @@
         // outside of the target
         this.dragBeginCoordinate_ = e.pageX;
         this.dragBeginTimeline_ = this.dragPlayer_.currentTime;
-        this.dragPlayer_.pause();
         this.dragPlayer_.playbackRate = 1;
+        this.dragPlayer_.play();
       },
       gestureEnd: function(e, detail, sender) {
         this.log_('ending gesture');
@@ -92,27 +98,47 @@
             this.dragPlayer_.reverse();
             this.log_('reversing');
           }
-          // set the playback rate such that
-          this.dragPlayer_.playbackRate = this.dragPlayer_.playbackRate*10;
+          // set the playback rate such that the thing 'snaps back'
+          this.dragPlayer_.playbackRate = this.dragPlayer_.playbackRate*15;
           this.dragPlayer_.play();
         }
       },
       gestureTrack: function(e, detail, sender) {
         // track the touch drag along the box's predefined translate animation
         var dragOffset = e.pageX - this.dragBeginCoordinate_;
-        //TODO this should probably be the touchable element's width not screen
+        //TODO strictly speaking this should use page width not screen width
         var timelineOffset =
           (dragOffset / window.screen.width) *
           this.dragDuration_;
-        this.dragPlayer_.currentTime =
-            (this.dragBeginTimeline_ + timelineOffset) * this.skew;
+        var targetTime =
+            (this.dragBeginTimeline_ + timelineOffset) * this.skew
         // clamp the values of currentTime to the valid animation range
-        if(this.dragPlayer_.currentTime < 0) {
-          this.dragPlayer_.currentTime = 0;
+        if(targetTime < 0) {
+          targetTime = 0;
           }
-        if(this.dragPlayer_.currentTime > this.dragDuration_) {
-          this.dragPlayer_.currentTime = this.dragDuration_;
+        if(targetTime > this.dragDuration_) {
+          targetTime = this.dragDuration_;
           }
+
+        /* Nice idea, but doesn't quite work.
+        // if the target time would jump the animation ahead significantly
+        // catch up instead
+        var timingSkew = Math.abs(targetTime - this.dragPlayer_.currentTime);
+        if(timingSkew > this.acceptableTimingSkew_) {
+          if(this.dragPlayer_.paused) {
+            this.log_('animating due to unacceptable timing skew of ' + timingSkew);
+            this.dragPlayer_.playbackRate = 8;
+            this.dragPlayer_.play();
+          }
+        }
+        // if the target time isn't far away, just seek there
+        else {
+        }
+        */
+        this.dragPlayer_.pause();
+        this.dragPlayer_.playbackRate = 1;
+        this.dragPlayer_.currentTime = targetTime;
+
         // (just some logging)
         if(!this.lastTrack_) this.lastTrack_ = this.dragBeginCoordinate_;
         this.log_('tracking physically to ' + e.pageX + ' from ' + this.lastTrack_ +
