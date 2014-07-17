@@ -147,11 +147,11 @@
         this.lastTrack = timelineOffset;
 
         // If we're nearing the end of the animation, peek in the photo tags
-        var _peekThreshold = 0.55;
-        if(this.dragPlayer.currentTime > this.dragDuration_ * _peekThreshold) {
+        var _peekThreshold = 0.45 * this.dragDuration_;
+        if(this.dragPlayer.currentTime > _peekThreshold) {
           // If we're crossing the threshold for the first time, animate
           if(!this.tagPlayer) {
-            console.log('hit tag peek threshold, beginning animation');
+            console.log('\[tags\]', 'hit tag peek threshold, beginning animation');
             this.tagPlayer = this.$.tags.animate([
               { transform: 'translateX(100%)' },
               { transform: 'translateX(0%)' }
@@ -164,14 +164,43 @@
           }
           // If this is a later time crossing the threshold
           else {
-            // If the tags have already animated in, animate them back out
+            // If the tags have previously animated in, animate them back out
             if(this.tagPeeked) {
-              //this.tagPlayer.playbackRate = -this.tagPlayer.playbackRate;
+              console.log('\[tags\]',
+                          'hit tag peek threshold with tags visible,',
+                          'beginning reversed animation');
               this.tagPlayer.reverse();
               this.tagPeeked = false;
             }
+            // If the tags have animated in and we've never crossed back over
+            // the peek threshold, do an overscroll-like effect on them
             else {
-              console.log('overscrolling tags');
+              if(this.tagPlayer.finished) {
+                if(!this.tagOverscrollPlayer) {
+                  console.log('\[tags\]', 'beginning overscrolling tags');
+                  this.tagOverscrollPlayer = this.$.tags.animate([
+                    {
+                      transform: 'translateX(0%)'
+                    },
+                    {
+                      transform: 'translateX(-25%)'
+                    }
+                    ],
+                    {
+                      duration: this.dragDuration_,
+                      fill: 'both'
+                    });
+                  this.tagOverscrollPlayer.play();
+                }
+                else {
+                  console.log('\[tags\]', 'overscrolling');
+                  this.tagOverscrollPlayer.currentTime =
+                    this.dragPlayer.currentTime;
+                }
+              }
+              else {
+                console.log('\[tags\]', 'forgoing overscroll so peek can finish');
+              }
             }
           }
         }
@@ -209,14 +238,17 @@
       shadowGestureEnd: function(e, detail, sender) {
         console.log('ending gesture');
         e.preventTap();
-        if(this.dragPlayer.currentTime == 0) {
-          return;
+        if(this.dragPlayer.currentTime != 0) {
+          if(this.dragPlayer.playbackRate > 0) {
+            this.dragPlayer.reverse();
+            console.log('reversing');
+          }
+          this.dragPlayer.play();
         }
-        if(this.dragPlayer.playbackRate > 0) {
-          this.dragPlayer.reverse();
-          console.log('reversing');
+        if(this.tagOverscrollPlayer) {
+          this.tagOverscrollPlayer.playbackRate = -1;
+          this.tagOverscrollPlayer.play();
         }
-        this.dragPlayer.play();
       }
     });
   </script>
