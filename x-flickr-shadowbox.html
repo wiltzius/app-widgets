@@ -22,9 +22,7 @@
         position: relative;
       }
       #shadowbox.interaction #touchContainer {
-        -webkit-transform-style: preserve-3d;
         /* make sure layer creation is already present for interaction */
-        transform: translateZ(0) rotateY(0); 
       }
       #shadowbox .front {
         position: absolute;
@@ -127,131 +125,6 @@
           }
           );
       },
-      shadowGestureTrack: function(e) {
-        // track the touch drag along the box's predefined translate animation
-        var dragOffset = e.pageX- this.dragBeginLocation;
-        var timelineOffset =
-          (dragOffset / window.screen.width) * this.dragDuration_;
-        this.dragPlayer.currentTime = this.timelineBegin + timelineOffset;
-        // clamp the values of currentTime to the valid animation range
-        if(this.dragPlayer.currentTime < 0) {
-          this.dragPlayer.currentTime = 0;
-          }
-        if(this.dragPlayer.currentTime > this.dragDuration_) {
-          this.dragPlayer.currentTime = this.dragDuration_;
-          }
-        // (just some logging)
-        if(!this.lastTrack) this.lastTrack=this.dragBeginLocation;
-        console.log('tracking by',
-            360*0.25*(timelineOffset - this.lastTrack)/this.dragDuration_);
-        this.lastTrack = timelineOffset;
-
-        // If we're nearing the end of the animation, peek in the photo tags
-        var _peekThreshold = 0.45 * this.dragDuration_;
-        if(this.dragPlayer.currentTime > _peekThreshold) {
-          // If we're crossing the threshold for the first time, animate
-          if(!this.tagPlayer) {
-            console.log('\[tags\]', 'hit tag peek threshold, beginning animation');
-            this.tagPlayer = this.$.tags.animate([
-              { transform: 'translateX(100%)' },
-              { transform: 'translateX(0%)' }
-              ],
-              { duration: 400,
-                fill: 'forwards',
-                easing: 'ease-in-out'
-              });
-            this.tagPlayer.play();
-          }
-          // If this is a later time crossing the threshold
-          else {
-            // If the tags have previously animated in, animate them back out
-            if(this.tagPeeked) {
-              console.log('\[tags\]',
-                          'hit tag peek threshold with tags visible,',
-                          'beginning reversed animation');
-              this.tagPlayer.reverse();
-              this.tagPeeked = false;
-            }
-            // If the tags have animated in and we've never crossed back over
-            // the peek threshold, do an overscroll-like effect on them
-            else {
-              if(this.tagPlayer.finished) {
-                if(!this.tagOverscrollPlayer) {
-                  console.log('\[tags\]', 'beginning overscrolling tags');
-                  this.initialOverscrollLocation_;
-                  this.tagOverscrollPlayer = this.$.tags.animate([
-                    {
-                      transform: 'translateX(0%)'
-                    },
-                    {
-                      transform: 'translateX(-25%)'
-                    }
-                    ],
-                    {
-                      duration: this.dragDuration_,
-                      fill: 'both'
-                    });
-                  this.tagOverscrollPlayer.play();
-                }
-                else {
-                  console.log('\[tags\]', 'overscrolling');
-                  this.
-                  this.tagOverscrollPlayer.currentTime =
-                    this.dragPlayer.currentTime;
-                }
-              }
-              else {
-                console.log('\[tags\]', 'forgoing overscroll so peek can finish');
-              }
-            }
-          }
-        }
-        else {
-          if(this.tagPlayer) {
-            // we've crossed back before the peek threshold
-            this.tagPeeked = true;
-            
-          }
-          else {
-            // we've never crossed into the peek threshold; do nothing
-          }
-        }
-      },
-      shadowGestureStart: function(e, detail, sender) {
-        console.log('beginning gesture on ', sender);
-        // If there isn't a drag in progress, start a new animation
-        if(!this.dragPlayer) {
-          var keyframes = [
-            { transform: 'translateX(0)' },
-            { transform: 'translateX(25%)' }
-            ];
-          this.dragPlayer = this.$.shadowbox.animate(keyframes,
-                                                     { duration: this.dragDuration_,
-                                                       fill: 'both',
-                                                       easing: 'ease-out'
-                                                     });
-        }
-        // Using either the new animation or the existing one, reset
-        // where this drag has begun from.
-        this.dragBeginLocation = e.pageX;
-        this.timelineBegin = this.dragPlayer.currentTime;
-        this.dragPlayer.pause();
-      },
-      shadowGestureEnd: function(e, detail, sender) {
-        console.log('ending gesture');
-        e.preventTap();
-        if(this.dragPlayer.currentTime != 0) {
-          if(this.dragPlayer.playbackRate > 0) {
-            this.dragPlayer.reverse();
-            console.log('reversing');
-          }
-          this.dragPlayer.play();
-        }
-        if(this.tagOverscrollPlayer) {
-          this.tagOverscrollPlayer.playbackRate = -1;
-          this.tagOverscrollPlayer.play();
-        }
-      }
     });
   </script>
 </polymer-element>
