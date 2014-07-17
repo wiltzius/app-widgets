@@ -140,19 +140,22 @@
           this.dragPlayer.currentTime = this.dragDuration_;
           }
         // (just some logging)
-        if(!this.lastTrack) this.lastTrack=0;
+        if(!this.lastTrack) this.lastTrack=this.dragBeginLocation;
         console.log('tracking by',
-            360*0.25*(timelineOffset - this.lastTrack)/this._dragDuration);
+            360*0.25*(timelineOffset - this.lastTrack)/this.dragDuration_);
         this.lastTrack = timelineOffset;
 
         // If we're nearing the end of the animation, peek in the photo tags
-        var _peekThreshold = 0.75;
-        if(this.dragPlayer.currentTime > this._dragDuration * _peekThreshold) {
+        var _peekThreshold = 0.55;
+        if(this.dragPlayer.currentTime > this.dragDuration_ * _peekThreshold) {
+          console.log('hit tag peek threshold, beginning animation');
           this.tagPlayer = this.$.tags.animate([
             { transform: 'translateX(100%)' },
             { transform: 'translateX(0%)' }
             ],
-            { duration: 500 });
+            { duration: 500,
+              fill: 'forwards'
+            });
           this.tagPlayer.play();
           console.log('animating tags');
         }
