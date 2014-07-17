@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>x-inertial-slider demo</title>
+    <script src="bower_components/platform-dev/platform.js"></script>
+    <meta name="viewport" content="width=device-width, user-scalable=yes, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="import" href="x-inertial-slider.html">
+    <style>
+      x-inertial-slider {
+        height: 100px;
+        padding: 20px;
+        margin: 10px;
+        box-sizing: border-box;
+        border: 3px solid blue;
+        background-color: steelblue;
+        font-family: Sans-Serif;
+        font-size: 18px;
+        font-weight: semi-bold;
+      }
+    </style>
+  </head>
+  <body class="polymer-ui-body-text" unresolved fullbleed layout vertical>
+    <x-inertial-slider min="0" max="75%">
+      Slide me, I resist.
+    </x-inertial-slider>
+  </body>
+</html>

@@ -178,6 +178,7 @@
               if(this.tagPlayer.finished) {
                 if(!this.tagOverscrollPlayer) {
                   console.log('\[tags\]', 'beginning overscrolling tags');
+                  this.initialOverscrollLocation_;
                   this.tagOverscrollPlayer = this.$.tags.animate([
                     {
                       transform: 'translateX(0%)'
@@ -194,6 +195,7 @@
                 }
                 else {
                   console.log('\[tags\]', 'overscrolling');
+                  this.
                   this.tagOverscrollPlayer.currentTime =
                     this.dragPlayer.currentTime;
                 }
