@@ -13,9 +13,9 @@
       #shadowbox {
         box-sizing: border-box;
         height: 344px;        /* TODO make this an attribute */
-        margin-left: 16px;
+        margin-left: 24px;
         margin-top: 8px;
-        margin-right: 16px;
+        margin-right: 24px;
       }
       #touchContainer {
         height: 100%;
@@ -76,22 +76,30 @@
         width: 100%;
         height: 100%;
       }
+      #tagOffset {
+        height: 100%;
+        width: 100%;
+        transform: translateX(28%);
+        transition: transform 0.2s linear;
+      }
       #description {
         text-overflow: ellipsis;
         overflow: hidden;
       }
     </style>
     <div id="shadowbox" class="interaction">
-      <x-inertial-slider max="25%" id="touchContainer">
+      <x-inertial-slider max="25%" id="touchContainer" on-snap="{{ sliderSnap }}">
         <div style="height:100%">
         <paper-shadow z="1"></paper-shadow>
         <div class="front" layout vertical>
           <div class="header-img">
             <img src="{{ photoModel.url_m }}" />
-            <x-inertial-slider class="tags" id="tags">
-              <template repeat="{{ tag in tags }}">
-                <x-flickr-taglabel>{{ tag }}</x-flickr-taglabel>
-              </template>
+            <x-inertial-slider class="tags" id="tags" min="0%" max="-20%" disabled>
+              <div id="tagOffset">
+                <template repeat="{{ tag in tags }}">
+                  <x-flickr-taglabel>{{ tag }}</x-flickr-taglabel>
+                </template>
+              </div>
             </x-inertial-slider>
           </div>
           <h3>{{photoModel.title}}<h3>
@@ -109,13 +117,22 @@
   </template>
   <script>
     Polymer('x-flickr-shadowbox', {
-      dragDuration_: 500,
+      tagShowThreshold: 0.2,
+      crossed_: false,
       photoModelChanged: function(oldVal, newVal) {
         this.$.description.innerHTML = newVal.description._content;
         // only take the first 6 (space-separated) tags
         this.tags = newVal.tags.split(' ').splice(0,6);
       },
       ready: function() {
+        this.$.tagOffset._setTransform = function(x) {
+          if(this._transform != x) {
+            this._transform = x; 
+            this.style.transform =
+                "translateX(" + x + "%)";
+          }
+        }
+        this.$.tagOffset._transform = 28;
       },
       log_: function(str) {
         console.log('\[shadowbox\]', str);
@@ -124,19 +141,63 @@
         '$.touchContainer.percentage': 'sliderPercentageChanged'
       },
       sliderPercentageChanged: function(oldVal, newVal) {
-        if(newVal > 0.2) {
-          this.showTags();
+        if(newVal > this.tagShowThreshold) {
+          if(this.crossed_) {
+            switch(this.$.tagOffset._transform) {
+              case 2:
+                // tags are on, toggle the tags off
+                this.$.tags.disabled = true;
+                this.$.tagOffset._setTransform(28);
+                this.log_('hiding tags');
+                break;
+              case 28:
+                this.log_('recently hidden tags');
+                break;
+              case 10:
+                // tags are peeking; correct, do nothing
+                break;
+            }
+          }
+          else {
+            switch(this.$.tagOffset._transform) {
+              case 2:
+                // should be impossible
+                console.warn('bad case');
+                break;
+              case 28:
+                // peek the tags
+                this.$.tags.disabled = false;
+                this.$.tagOffset._setTransform(10);
+                this.log_('peeking tags');
+                break;
+              case 10:
+                // tags are peeking; OK, do nothing
+                break;
+            }
+          }
+        }
+        else {
+          if(this.recentlyHidden_) {
+            this.crossed_ = false;
+            this.recentlyHidden_ = false;
+          }
         }
       },
-      showTags: function() {
-        if(!this.tagPlayer_) {
-          this.tagPlayer_ = this.$.tags.animate([
-            { transform: 'translateX(100%)' },
-            { transform: 'translateX(50%)' }
-          ], {
-            duration: 400,
-            fill: 'both'
-          });
+      sliderSnap: function(e, detail, sender) {
+        // since there are two sliders inside one another we gets snap events
+        // for both as they bubble, so do event delegation here.
+        if(e.srcElement === this.$.touchContainer) {
+          if(this.$.tagOffset._transform == 28) {
+              this.log_('releasing with tags hidden'); 
+              this.crossed_ = false;
+              return;
+            }
+          if(this.$.touchContainer.percentage > this.tagShowThreshold) {
+              this.log_('showing tags fully');
+              this.$.tagOffset._setTransform(2);
+              this.$.tags.disabled = true;
+              this.crossed_ = true;
+          }
         }
       },
       shadowTap: function(e, detail, sender) {

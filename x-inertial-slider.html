@@ -11,6 +11,7 @@
     - figure out initial jank
 
   Attributes:
+    disabled: does the slider slide or not (default false)
     min: string value for translateX at beginning (default 0%)
     max: string value for translateX at end (default 100%)
     snapPoints: list of values to snap to. Default to none, but set to same
@@ -22,7 +23,7 @@
                 coordinate space (i.e. what percentage of the slider has
                 the finger tracked across)
  -->
-<polymer-element name="x-inertial-slider" touch-action="pan-y" on-trackstart="{{gestureStart}}" on-trackend="{{gestureEnd}}" on-track="{{gestureTrack}}" attributes="resistance snapPoints min max percentage">
+<polymer-element name="x-inertial-slider" touch-action="pan-y" on-trackstart="{{gestureStart}}" on-trackend="{{gestureEnd}}" on-track="{{gestureTrack}}" attributes="resistance snapPoints min max percentage disabled">
   <template>
     <style>
       :host {
@@ -41,6 +42,7 @@
   </template>
   <script>
     Polymer('x-inertial-slider', {
+      disabled: false,
       // controls resolution of the animation; set high to avoid rounding
       resistance: 0.9,
       //acceptableTimingSkew_: 20,   //TODO don't make this constant
@@ -105,8 +107,11 @@
           this.dragPlayer_.playbackRate = this.dragPlayer_.playbackRate*15;
           this.dragPlayer_.play();
         }
+        this.fire('snap', {});
       },
       gestureTrack: function(e, detail, sender) {
+        if(this.disabled)
+          return;
         // If the element was programmatically added, we might have missed
         // the gesture start event -- optionally call it.
         if(this.dragBeginTimeline_ === null ||
