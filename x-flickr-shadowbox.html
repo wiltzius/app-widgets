@@ -70,10 +70,11 @@
       .header-img .tags {
         position: absolute;
         top: 0;
-        right: 0;
+        left: 0;
         z-index: 2;
         opacity: 0.75;
-        transform: translateX(100%);
+        width: 100%;
+        height: 100%;
       }
       #description {
         text-overflow: ellipsis;
@@ -123,8 +124,19 @@
         '$.touchContainer.percentage': 'sliderPercentageChanged'
       },
       sliderPercentageChanged: function(oldVal, newVal) {
-        if(newVal > 0.5) {
-        this.log_('change!');
+        if(newVal > 0.2) {
+          this.showTags();
+        }
+      },
+      showTags: function() {
+        if(!this.tagPlayer_) {
+          this.tagPlayer_ = this.$.tags.animate([
+            { transform: 'translateX(100%)' },
+            { transform: 'translateX(50%)' }
+          ], {
+            duration: 400,
+            fill: 'both'
+          });
         }
       },
       shadowTap: function(e, detail, sender) {
