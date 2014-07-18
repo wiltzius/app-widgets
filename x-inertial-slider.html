@@ -25,22 +25,16 @@
       :host {
         display: block;
       }
-      #log {
-        position: absolute;
-        z-index: 1000;
-        bottom: 10px;
-      }
       #offsetContainer {
         will-change: transform;
         transform: translateX({{min}});
+        height:100%;
+        transform-style: preserve-3d;
       }
     </style>
-    <div id="slideContainer">
-      <div id="offsetContainer">
-        <content></content>
-      </div>
+    <div id="offsetContainer">
+      <content></content>
     </div>
-    <div id="log"></div>
   </template>
   <script>
     Polymer('x-inertial-slider', {
@@ -54,7 +48,6 @@
       logTag_: '\[inertial-slider\]',
       log_: function(str) {
         console.log(this.logTag_, str);
-      this.$.log.innertHTML += str + '<br/>';
       },
       ready: function() {
         if(!this.snapPoints) {

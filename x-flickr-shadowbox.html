@@ -3,6 +3,7 @@
 <link rel="import" href="bower_components/core-elements/core-elements.html">
 <link rel="import" href="bower_components/paper-elements/paper-elements.html">
 <link rel="import" href="x-flickr-taglabel.html">
+<link rel="import" href="x-inertial-slider.html">
 <polymer-element name="x-flickr-shadowbox" on-down="{{shadowGestureDown}}" touch-action="pan-y" on-trackstart="{{shadowGestureStart}}" on-trackend="{{shadowGestureEnd}}" on-track="{{shadowGestureTrack}}" on-tap="{{shadowTap}}" attributes="photoModel">
   <template>
     <style>
@@ -15,7 +16,6 @@
         margin-left: 16px;
         margin-top: 8px;
         margin-right: 16px;
-        -webkit-transform-style: preserve-3d;
       }
       #touchContainer {
         height: 100%;
@@ -23,6 +23,10 @@
       }
       #shadowbox.interaction #touchContainer {
         /* make sure layer creation is already present for interaction */
+        transform-style: preserve-3d;
+      }
+      #shadowbox.interaction #touchContainer * {
+        transform-style: preserve-3d;
       }
       #shadowbox .front {
         position: absolute;
@@ -31,9 +35,13 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
+        transform-style: preserve-3d;
       }
       #shadowbox.interaction .front {
         backface-visibility: hidden;
+      }
+      #shadowbox x-inertial-slider {
+        height: 100%;
       }
       #shadowbox .back {
         position: absolute;
@@ -74,25 +82,35 @@
     </style>
 
     <div id="shadowbox" class="interaction">
-      <div id="touchContainer">
-        <paper-shadow z="1"></paper-shadow>
-        <div class="back" layout vertical>
-          <h3>{{photoModel.title}}</h3>
-          <p>{{photoModel.ownername}}</p>
-          <p id="description" class="description" flex>{{photoModel.description.content_}}</p>
-        </div>
-        <div class="front" layout vertical>
-          <div class="header-img">
-            <img src="{{ photoModel.url_m }}" />
-            <div class="tags" id="tags">
-              <template repeat="{{ tag in tags }}">
-                <x-flickr-taglabel>{{ tag }}</x-flickr-taglabel>
-              </template>
+          <x-inertial-slider max="25%" id="touchContainer">
+            <div style="height:100%">
+            <paper-shadow z="1"></paper-shadow>
+            <div class="front" layout vertical>
+              <div class="header-img">
+                <img src="{{ photoModel.url_m }}" />
+                <div>
+                  <div class="tags" id="tags">
+                    <template repeat="{{ tag in tags }}">
+                      <x-flickr-taglabel>{{ tag }}</x-flickr-taglabel>
+                    </template>
+                  </div>
+                </div>
+              </div>
+              <h3>{{photoModel.title}}<h3>
             </div>
-          </div>
-          <h3>{{photoModel.title}}<h3>
-        </div>
-      </div>
+            <div class="back" layout vertical>
+              <h3>{{photoModel.title}}</h3>
+              <p>{{photoModel.ownername}}</p>
+              <p id="description" class="description" flex>
+                {{photoModel.description.content_}}
+              </p>
+            </div>
+            </div>
+          </x-inertial-slider>
+        <!--
+        </div>-->
+        <!--
+        -->
     </div>
   </template>
   <script>
@@ -124,7 +142,7 @@
             fill: "both"
           }
           );
-      },
+        },
     });
   </script>
 </polymer-element>
