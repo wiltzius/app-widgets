@@ -80,37 +80,30 @@
         overflow: hidden;
       }
     </style>
-
     <div id="shadowbox" class="interaction">
-          <x-inertial-slider max="25%" id="touchContainer">
-            <div style="height:100%">
-            <paper-shadow z="1"></paper-shadow>
-            <div class="front" layout vertical>
-              <div class="header-img">
-                <img src="{{ photoModel.url_m }}" />
-                <div>
-                  <div class="tags" id="tags">
-                    <template repeat="{{ tag in tags }}">
-                      <x-flickr-taglabel>{{ tag }}</x-flickr-taglabel>
-                    </template>
-                  </div>
-                </div>
-              </div>
-              <h3>{{photoModel.title}}<h3>
-            </div>
-            <div class="back" layout vertical>
-              <h3>{{photoModel.title}}</h3>
-              <p>{{photoModel.ownername}}</p>
-              <p id="description" class="description" flex>
-                {{photoModel.description.content_}}
-              </p>
-            </div>
-            </div>
-          </x-inertial-slider>
-        <!--
-        </div>-->
-        <!--
-        -->
+      <x-inertial-slider max="25%" id="touchContainer">
+        <div style="height:100%">
+        <paper-shadow z="1"></paper-shadow>
+        <div class="front" layout vertical>
+          <div class="header-img">
+            <img src="{{ photoModel.url_m }}" />
+            <x-inertial-slider class="tags" id="tags">
+              <template repeat="{{ tag in tags }}">
+                <x-flickr-taglabel>{{ tag }}</x-flickr-taglabel>
+              </template>
+            </x-inertial-slider>
+          </div>
+          <h3>{{photoModel.title}}<h3>
+        </div>
+        <div class="back" layout vertical>
+          <h3>{{photoModel.title}}</h3>
+          <p>{{photoModel.ownername}}</p>
+          <p id="description" class="description" flex>
+            {{photoModel.description.content_}}
+          </p>
+        </div>
+        </div>
+      </x-inertial-slider>
     </div>
   </template>
   <script>
@@ -122,6 +115,17 @@
         this.tags = newVal.tags.split(' ').splice(0,6);
       },
       ready: function() {
+      },
+      log_: function(str) {
+        console.log('\[shadowbox\]', str);
+      },
+      observe: {
+        '$.touchContainer.percentage': 'sliderPercentageChanged'
+      },
+      sliderPercentageChanged: function(oldVal, newVal) {
+        if(newVal > 0.5) {
+        this.log_('change!');
+        }
       },
       shadowTap: function(e, detail, sender) {
         if(this.rotationPlayer) {

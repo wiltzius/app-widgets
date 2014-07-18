@@ -18,8 +18,11 @@
     resistance: scale inputs by this value, slows everything down. Note if this is
                 < 1 the user can't drag all the way to the max value (default
                 is 0.9)
+    percentage: (read-only) value of the slider's progression in input
+                coordinate space (i.e. what percentage of the slider has
+                the finger tracked across)
  -->
-<polymer-element name="x-inertial-slider" touch-action="pan-y" on-trackstart="{{gestureStart}}" on-trackend="{{gestureEnd}}" on-track="{{gestureTrack}}" attributes="resistance touchElement useImplAnimation snapPoints snapAnimDuration min max">
+<polymer-element name="x-inertial-slider" touch-action="pan-y" on-trackstart="{{gestureStart}}" on-trackend="{{gestureEnd}}" on-track="{{gestureTrack}}" attributes="resistance snapPoints min max percentage">
   <template>
     <style>
       :host {
@@ -45,6 +48,10 @@
       dragDuration_: 5000,
       min: '0%',
       max: '100%',
+      percentage: {
+        value: 0,
+        reflect: true,
+        },
       logTag_: '\[inertial-slider\]',
       log_: function(str) {
         console.log(this.logTag_, str);
@@ -141,6 +148,7 @@
         this.dragPlayer_.pause();
         this.dragPlayer_.playbackRate = 1;
         this.dragPlayer_.currentTime = targetTime;
+        this.percentage = (this.dragPlayer_.currentTime / this.dragDuration_);
 
         // (just some logging)
         if(!this.lastTrack_) this.lastTrack_ = this.dragBeginCoordinate_;
